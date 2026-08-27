@@ -15,6 +15,7 @@ Each skill is a consultative process, not a reference dump. It asks questions be
 
 ```bash
 git clone https://github.com/madhusnagaraj/agent-skills-bundle.git
+mkdir -p ~/.claude/skills
 cp -R agent-skills-bundle/skills/* ~/.claude/skills/
 ```
 
