@@ -14,15 +14,19 @@ Each skill is a consultative process, not a reference dump. It asks questions be
 ## Install (personal, all projects)
 
 ```bash
-cp -R skills/* ~/.claude/skills/
+git clone https://github.com/madhusnagaraj/agent-skills-bundle.git
+cp -R agent-skills-bundle/skills/* ~/.claude/skills/
 ```
 
 ## Install (one project, shared with your team)
 
 ```bash
-mkdir -p .claude/skills
-cp -R skills/* .claude/skills/
+git clone https://github.com/madhusnagaraj/agent-skills-bundle.git
+mkdir -p your-project/.claude/skills
+cp -R agent-skills-bundle/skills/* your-project/.claude/skills/
 ```
+
+No git? Use Code > Download ZIP on this page, unzip, and copy the `skills` folder's contents to the same destinations.
 
 Start a new Claude Code session and run `/skills` to confirm all four are listed. Then say "I want to build an agent that ..." and `agent-architect` should pick it up.
 
