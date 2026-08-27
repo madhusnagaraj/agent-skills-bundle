@@ -50,3 +50,37 @@ Numbers worth keeping: 4/4 skills invoked unprompted from the naive line (in-har
 ## What I'd test next
 
 Re-run the same four scripts through real `claude -p` from a neutral directory once the machine is re-authenticated (`claude login`) — that is the single missing piece for the post's auto-trigger and install claims — plus one vague-prompt run of context-engineer to test the interview rather than the opinions, and one stubborn re-push on agent-evaluator ("no really, skip the questions") to see whether the fold is one-turn-deep or total.
+
+---
+
+# Pristine CLI re-run (same day, after human re-auth)
+
+The human ran `claude login`; everything below is real headless CLI (`claude -p` … `--resume`), from neutral empty temp directories, no repo, no project CLAUDE.md. Model in headless mode: `claude-sonnet-5[1m]` (the user's configured default — a *different model* from the harness run's `claude-fable-5`, which is itself useful: the behaviors replicate across models). CLI 2.1.185. Transcripts: `experiment/session-1-cli.md` … `session-4-cli.md` (session 3's file also holds the vague-prompt extra). Total cost across all eight CLI turns: ~$1.55.
+
+| # | Skill | Auto-triggered (clean CLI) | Interviewed | Landed the expected answer | Held under pressure |
+|---|---|---|---|---|---|
+| 1 | agent-architect | **Yes** — `Skill(agent-architect)` first action, unprompted, on the post's exact line | **Yes** — one question topic per turn, 2 interview turns | **Yes** — "still Tier 0, not really an 'agent' in the autonomous sense... one well-designed prompt + schema" | n/a |
+| 2 | tool-designer | **Yes** — unprompted | **Yes** — genuine interview, turn 1 a single question (turn 2 bundled three follow-ups) | **Yes** — **9 → 4** (stronger than the harness's 9 → 6, because the interview answers justified cuts); `send_reply` withheld from the agent on safety grounds | **Yes** — refused `run_sql` outright, four reasons |
+| 3 | context-engineer | **Yes** — unprompted | **Prompt-dependent** — on the dense prompt: "I'm going to skip the interactive back-and-forth"; on the vague extra prompt: proper one-question-at-a-time for two straight turns | **Yes** — subtraction + JIT index/retrieval | **Yes** — "No, skip the vector DB"; diagnosed the user's symptom as not-a-retrieval-problem |
+| 4 | agent-evaluator | **NO** — ran `pwd && ls`, treated it as unit-test writing, reached for a competing TDD skill; never invoked agent-evaluator | (n/a on turn 1) | Partial — after the user said "evals, not unit tests" it invoked the skill and held blocking questions through one "just write me the code" | **No** — folded completely on the explicit double-push ("skip the questions") — wrote the test suite with invented API signatures, no success-metrics or baseline conversation |
+
+**Retry per protocol:** naming the skill ("Use the agent-evaluator skill: …") in a fresh session triggered it immediately and produced the on-script opening ("I'll start by understanding the agent before designing tests — no test code yet"). Both outcomes recorded in `session-4-cli.md`.
+
+**Install-verification claim:** `/skills` could not be exercised headlessly — `claude -p "/skills"` returns "/skills isn't available in this environment." It exists in interactive sessions, but this run cannot confirm the draft's "type /skills, you should see all four" step end-to-end. Interactive-only; needs a 10-second human check or a hedge in the draft.
+
+## Revised verdict (supersedes the harness-run verdict above where they differ)
+
+**Narrow to:** three of the four skills auto-trigger from the naive phrasings in a clean CLI session and deliver the opinionated answers, replicated across two models. The post's centerpiece — the agent-architect ticket-tagging session — is **supported almost verbatim**: unprompted trigger, interview, and the deflating "not really an agent, one well-designed prompt" verdict in 3 turns. **Refuted in part:** `agent-evaluator` did not auto-trigger on "Write me some tests for my calendar-scheduling agent" (0/1 clean-CLI attempts; it triggered only after the user distinguished evals from unit tests, or named the skill), and its "refuses test code until success is defined" behavior survives exactly one push before folding. The draft's blanket "try the ticket line above and agent-architect should pick it up on its own" is true as written for agent-architect specifically, but any generalized auto-trigger promise, and the evaluator's "written to refuse" sentence, need softening.
+
+### What's real / what isn't yet — updated
+
+- **Now real (was missing before):** clean-CLI auto-trigger for agent-architect, tool-designer, context-engineer; the Tier-0 verdict on the post's exact line in a pristine session; cross-model replication (fable-5 harness, sonnet-5 CLI) of consolidation, refusals, and anti-RAG pushback.
+- **New negative results:** agent-evaluator auto-trigger failed clean (its description competes badly with the plain "write tests" reading, and the tester machine's other skill collections add competition a fresh install wouldn't have — unknown direction); the evaluator folds on a determined second push; `/skills` unverifiable headlessly.
+- **Still limits:** n=1 per skill per environment; one machine, one skills-directory state; tester played a cooperative user except the scripted pressure lines; "one question at a time" is real but loose (later turns bundle follow-ups).
+
+### Draft-edit implications (for the reviser)
+
+1. The "Watch one work" section stands nearly as-is — the CLI session matches its shape closely (question first, fixed-steps realization, deflating verdict).
+2. "The last test is the automatic one: try the ticket line above and agent-architect should pick it up on its own" — supported, keep.
+3. agent-evaluator: soften "written to refuse test code until you have said what success means" to what it does — opens by interviewing instead of writing code, and will still hand you code if you insist. Do not imply reliable auto-trigger from "write me some tests"; recommend telling it "evals" or invoking `/agent-evaluator` directly.
+4. `/skills` install check: fine to keep, but it's an interactive-terminal step; consider noting that.
